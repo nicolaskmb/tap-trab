@@ -1,0 +1,120 @@
+@contentType = application/json
+
+### ================
+### 1. AUTH SERVICE
+### ================
+
+### 1.1 Criar Usuário A
+# @name createUserA
+POST http://localhost:8085/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Alice",
+  "email": "alice@teste.com",
+  "password": "12345678"
+}
+
+###
+@userA_Id = {{createUserA.response.body.id}}
+
+
+### 1.2 Criar Usuário B
+# @name createUserB
+POST http://localhost:8085/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Bob",
+  "email": "bob@teste.com",
+  "password": "12345678"
+}
+
+###
+@userB_Id = {{createUserB.response.body.id}}
+
+
+### 1.3 Listar Todos os Usuários
+GET http://localhost:8085/users
+Content-Type: {{contentType}}
+
+
+### 1.4 Login A
+# @name loginA
+POST http://localhost:8085/auth/login/password
+Content-Type: {{contentType}}
+
+{
+  "email": "alice@teste.com",
+  "password": "12345678"
+}
+
+@authToken = {{loginA.response.body.accessToken}}
+
+### 1.5 Login B
+# @name loginB
+POST http://localhost:8085/auth/login/password
+Content-Type: {{contentType}}
+
+{
+  "email": "bob@teste.com",
+  "password": "12345678"
+}
+
+@authToken = {{loginB.response.body.accessToken}}
+
+### 1.6 Atualizar o próprio nome do Usuário A
+PUT http://localhost:8085/users/me
+X-User-Id: {{userA_Id}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Alice Wonderland"
+}
+
+
+### ================
+### 2. CHAT SERVICE
+### ================
+
+### 2.1 Listar minhas conversas
+GET http://localhost:8081/chat/conversations
+X-User-Id: {{userA_Id}}
+
+
+### 2.2 Iniciar nova conversa com B
+# @name startChat
+POST http://localhost:8081/chat/conversations
+X-User-Id: {{userA_Id}}
+Content-Type: {{contentType}}
+
+{
+  "targetUserId": "{{userB_Id}}"
+}
+
+###
+@chatId = {{startChat.response.body.id}}
+
+
+### 2.3 Enviar Mensagem para Usuario B
+POST http://localhost:8081/chat/conversations/{{chatId}}/messages
+X-User-Id: {{userA_Id}}
+Content-Type: {{contentType}}
+
+{
+  "content": "Olá, Bob! Como vai?"
+}
+
+### 2.4 Enviar Mensagem para Usuario A
+POST http://localhost:8081/chat/conversations/{{chatId}}/messages
+X-User-Id: {{userB_Id}}
+Content-Type: {{contentType}}
+
+{
+  "content": "Oi, Alice! Estou bem, obrigado!"
+}
+
+
+### 2.5 Ler Mensagens da Conversa
+GET http://localhost:8081/chat/conversations/{{chatId}}/messages
+X-User-Id: {{userA_Id}}

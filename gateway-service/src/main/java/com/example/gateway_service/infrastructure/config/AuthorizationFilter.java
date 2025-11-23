@@ -1,11 +1,11 @@
 package com.example.gateway_service.infrastructure.config;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -14,10 +14,10 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.gateway_service.domain.user.vo.RoleType;
 
 import reactor.core.publisher.Mono;
 
+@Component
 public class AuthorizationFilter implements WebFilter {
 
     @Value("${jwt.secret}")
@@ -26,7 +26,9 @@ public class AuthorizationFilter implements WebFilter {
     private static final String[] PUBLIC_ENDPOINTS = {
             "/auth/login",
             "/auth/register",
-            "/eureka"
+            "/eureka",
+            "/api-docs",
+            "/swagger-ui"
     };
 
     @Override
